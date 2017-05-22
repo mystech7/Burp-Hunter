@@ -43,16 +43,20 @@ public class HunterConfig extends JPanel implements ITab {
     private boolean createProbe;
     private Properties prop;
     private List<String> probes;
+    private File fConfig;
     
     /**
      * Creates new form NewJPanel
      */
     public HunterConfig() {
         try {
-            File yourFile = new File("hunter.config");
-            yourFile.createNewFile();
+            fConfig = new File("hunter.config");
+            fConfig.createNewFile();
             prop = new Properties();
-            prop.load(new FileInputStream("hunter.config"));           
+            if (fConfig.exists()) {
+              prop.load(new FileInputStream(fConfig));                       
+            } else
+                Logger.getLogger(BurpExtender.class.getName()).log(Level.ALL, null, "Unable to save Config");
         } catch (IOException ex) {
             Logger.getLogger(HunterConfig.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -263,12 +267,14 @@ public class HunterConfig extends JPanel implements ITab {
             prop.setProperty("probe[beta][base64]", betaBase);
             prop.setProperty("probe[beta][inject]", betaInject);
         }
-        try {
-            prop.store(new FileOutputStream("hunter.config"), null);
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(HunterConfig.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(HunterConfig.class.getName()).log(Level.SEVERE, null, ex);
+        if (fConfig.exists()) {
+            try {
+                prop.store(new FileOutputStream(fConfig), null);
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(HunterConfig.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(HunterConfig.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
 
         model.addTableModelListener(new TableModelListener() {
@@ -280,12 +286,14 @@ public class HunterConfig extends JPanel implements ITab {
                     prop.setProperty("probe["+probeTable.getValueAt(e.getFirstRow(), 1).toString()+"][enabled]", "true");
                     else
                     prop.setProperty("probe["+probeTable.getValueAt(e.getFirstRow(), 1).toString()+"][enabled]", "false");
-                    try {
-                        prop.store(new FileOutputStream("hunter.config"), null);
-                    } catch (FileNotFoundException ex) {
-                        Logger.getLogger(HunterConfig.class.getName()).log(Level.SEVERE, null, ex);
-                    } catch (IOException ex) {
-                        Logger.getLogger(HunterConfig.class.getName()).log(Level.SEVERE, null, ex);
+                    if (fConfig.exists()) {
+                        try {
+                            prop.store(new FileOutputStream(fConfig), null);
+                        } catch (FileNotFoundException ex) {
+                            Logger.getLogger(HunterConfig.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (IOException ex) {
+                            Logger.getLogger(HunterConfig.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                     }
                 }
             }
@@ -399,13 +407,15 @@ public class HunterConfig extends JPanel implements ITab {
         prop.setProperty("probe["+probe+"][enabled]", "true");
         prop.setProperty("probe["+probe+"][base64]", newBase.getText());
         prop.setProperty("probe["+probe+"][inject]", newInject.getText());
-        
-        try {
-            prop.store(new FileOutputStream("hunter.config"), null);
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(HunterConfig.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(HunterConfig.class.getName()).log(Level.SEVERE, null, ex);
+
+        if (fConfig.exists()) {
+            try {
+                prop.store(new FileOutputStream(fConfig), null);
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(HunterConfig.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(HunterConfig.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         newProbe.setText("");
         newInject.setText("");
@@ -435,34 +445,40 @@ public class HunterConfig extends JPanel implements ITab {
         prop.remove("probe["+probe+"][enabled]");
         prop.remove("probe["+probe+"][base64]");
         prop.remove("probe["+probe+"][inject]");
-        try {
-            prop.store(new FileOutputStream("hunter.config"), null);
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(HunterConfig.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(HunterConfig.class.getName()).log(Level.SEVERE, null, ex);
+        if (fConfig.exists()) {
+            try {
+                prop.store(new FileOutputStream(fConfig), null);
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(HunterConfig.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(HunterConfig.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }//GEN-LAST:event_delProbeAction
 
     private void hunterDomainFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_hunterDomainFocusLost
         prop.setProperty("domain", hunterDomain.getText());
-        try {
-            prop.store(new FileOutputStream("hunter.config"), null);
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(HunterConfig.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(HunterConfig.class.getName()).log(Level.SEVERE, null, ex);
+        if (fConfig.exists()) {
+            try {
+                prop.store(new FileOutputStream(fConfig), null);
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(HunterConfig.class.getName()).log(Level.SEVERE, null, ex);
+           } catch (IOException ex) {
+                Logger.getLogger(HunterConfig.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }//GEN-LAST:event_hunterDomainFocusLost
 
     private void hunterKeyFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_hunterKeyFocusLost
         prop.setProperty("key", hunterKey.getText());
-        try {
-            prop.store(new FileOutputStream("hunter.config"), null);
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(HunterConfig.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(HunterConfig.class.getName()).log(Level.SEVERE, null, ex);
+        if (fConfig.exists()) {
+            try {
+                prop.store(new FileOutputStream(fConfig), null);
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(HunterConfig.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(HunterConfig.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }//GEN-LAST:event_hunterKeyFocusLost
 

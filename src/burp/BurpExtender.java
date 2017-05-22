@@ -160,7 +160,6 @@ public class BurpExtender implements IBurpExtender, IMessageEditorTabFactory, IH
     public void processHttpMessage(int toolFlag, boolean messageIsRequest, IHttpRequestResponse messageInfo) {
         if(messageIsRequest) {
             byte[] req = messageInfo.getRequest();
-            //String req = new String();
             if (callbacks.isInScope(helpers.analyzeRequest(messageInfo).getUrl())) {
                 if("".equals(hunterConfig.getDomain())) {
                     callbacks.printOutput("XSS Hunter needs a valid domain and access key set on configuration tab");

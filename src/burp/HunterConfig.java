@@ -52,13 +52,25 @@ public class HunterConfig extends JPanel implements ITab {
         try {
             fConfig = new File("hunter.config");
             fConfig.createNewFile();
-            prop = new Properties();
-            if (fConfig.exists()) {
-              prop.load(new FileInputStream(fConfig));                       
-            } else
-                Logger.getLogger(BurpExtender.class.getName()).log(Level.ALL, null, "Unable to save Config");
         } catch (IOException ex) {
-            Logger.getLogger(HunterConfig.class.getName()).log(Level.SEVERE, null, ex);
+            if (System.getProperty("os.name").toUpperCase().contains("WIN")) {
+                fConfig = new File(System.getenv("AppData")+System.getProperty("path.separator")+"hunter.config");
+            } else {
+                fConfig = new File(System.getProperty("user.home")+System.getProperty("path.separator")+"hunter.config");
+            }
+            try {
+                fConfig.createNewFile();
+            } catch (IOException ex1) {
+                Logger.getLogger(HunterConfig.class.getName()).log(Level.SEVERE, null, ex1);
+            }
+        }
+        prop = new Properties();
+        if (fConfig.exists()) {
+            try {
+                prop.load(new FileInputStream(fConfig));
+            } catch (IOException ex) {
+                Logger.getLogger(HunterConfig.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         
         initComponents();

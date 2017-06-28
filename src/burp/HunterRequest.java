@@ -99,11 +99,15 @@ public class HunterRequest {
         }
         
         if (send && pPresent) {
-            String resp = notifyHunter(content);
-            if (resp.contains("\"success\": false")) {
-                callbacks.printError(resp);
-            } else {
-                callbacks.printOutput("Recorded Injection: "+injectKey);
+            try {
+                String resp = notifyHunter(content);
+                if (resp.contains("\"success\": false")) {
+                    callbacks.printError(resp);
+                } else {
+                    callbacks.printOutput("Recorded Injection: "+injectKey);
+                }
+            } catch (Exception ex) {
+                callbacks.printError("Unable to record injection on the host: api"+hunterDomain.substring(hunterDomain.indexOf(".")));
             }
         }
         return content;

@@ -68,19 +68,19 @@ public class HunterRequest {
             if((boolean) probes.getValueAt(row, 0) == true) {
                 if (request.contains(probes.getValueAt(row, 1).toString())) {
                     pPresent = true;
-                    if(probes.getValueAt(row, 2) != null) {
-                        String script = probes.getValueAt(row, 2).toString().replace("[DOMAIN]", hunterDomain+"/"+injectKey);
+                    if(probes.getValueAt(row, 3) != null) {
+                        String script = probes.getValueAt(row, 3).toString().replace("[DOMAIN]", hunterDomain+"/"+injectKey);
                         b64 = Base64.getEncoder().encodeToString(script.getBytes());
                         if (b64.contains("+")) {
-                            script = probes.getValueAt(row, 2).toString().replace("[DOMAIN]", hunterDomain+"/"+injectKey+"?a");
+                            script = probes.getValueAt(row, 3).toString().replace("[DOMAIN]", hunterDomain+"/"+injectKey+"?a");
                             b64 = Base64.getEncoder().encodeToString(script.getBytes());
                         }
                         if (b64.contains("+")) {
-                            script = probes.getValueAt(row, 2).toString().replace("[DOMAIN]", hunterDomain+"/"+injectKey+"?aaa");
+                            script = probes.getValueAt(row, 3).toString().replace("[DOMAIN]", hunterDomain+"/"+injectKey+"?aaa");
                             b64 = Base64.getEncoder().encodeToString(script.getBytes());
                         } // If b64 still contains +, give up
                     }
-                    inject = probes.getValueAt(row, 3).toString().replace("[DOMAIN]", hunterDomain+"/"+injectKey);
+                    inject = probes.getValueAt(row, 2).toString().replace("[DOMAIN]", hunterDomain+"/"+injectKey);
                     inject = inject.replace("[BASE64]", b64);
 
                     request = request.replace(probes.getValueAt(row, 1).toString(), inject);

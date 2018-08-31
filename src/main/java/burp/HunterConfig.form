@@ -163,12 +163,19 @@
                       <Component id="jSeparator2" max="32767" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
-                      <EmptySpace min="-2" max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="1" max="-2" attributes="0">
-                          <Component id="editProbe" alignment="0" max="32767" attributes="0"/>
-                          <Component id="delProbe" alignment="0" max="32767" attributes="0"/>
-                          <Component id="addProbe" max="32767" attributes="0"/>
-                          <Component id="copyProbe" alignment="0" max="32767" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="103" groupAlignment="1" attributes="0">
+                              <Group type="103" groupAlignment="1" max="-2" attributes="0">
+                                  <Component id="editProbe" alignment="0" pref="80" max="32767" attributes="0"/>
+                                  <Component id="addProbe" pref="80" max="32767" attributes="0"/>
+                                  <Component id="copyProbe" alignment="0" pref="80" max="32767" attributes="0"/>
+                              </Group>
+                              <Component id="expButton" min="-2" pref="80" max="-2" attributes="0"/>
+                              <Component id="impButton1" min="-2" pref="80" max="-2" attributes="0"/>
+                              <Component id="loadButton" alignment="1" min="-2" pref="80" max="-2" attributes="0"/>
+                          </Group>
+                          <Component id="delProbe" alignment="0" min="-2" pref="80" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="jScrollPane1" pref="473" max="32767" attributes="0"/>
@@ -233,7 +240,12 @@
                       <Component id="copyProbe" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="delProbe" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                      <EmptySpace max="32767" attributes="0"/>
+                      <Component id="loadButton" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="impButton1" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="expButton" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <Component id="jScrollPane1" pref="325" max="32767" attributes="0"/>
               </Group>
@@ -346,6 +358,30 @@
       <Properties>
         <Property name="text" type="java.lang.String" value="Injections will only be executed on hosts listed as in-scope."/>
       </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="loadButton">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Load"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="loadButtonActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JButton" name="expButton">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Export"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="expButtonActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JButton" name="impButton1">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Import"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="impButton1ActionPerformed"/>
+      </Events>
     </Component>
   </SubComponents>
 </Form>

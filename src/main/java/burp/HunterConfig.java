@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.event.TableModelEvent;
@@ -114,6 +115,9 @@ public class HunterConfig extends JPanel implements ITab {
         probeTable = new javax.swing.JTable();
         jLabel9 = new javax.swing.JLabel();
         jLabel10 = new javax.swing.JLabel();
+        loadButton = new javax.swing.JButton();
+        expButton = new javax.swing.JButton();
+        impButton1 = new javax.swing.JButton();
 
         probeDialogue.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         probeDialogue.setTitle("Add XSS Hunter Probe");
@@ -335,6 +339,27 @@ public class HunterConfig extends JPanel implements ITab {
 
         jLabel10.setText("Injections will only be executed on hosts listed as in-scope.");
 
+        loadButton.setText("Load");
+        loadButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                loadButtonActionPerformed(evt);
+            }
+        });
+
+        expButton.setText("Export");
+        expButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                expButtonActionPerformed(evt);
+            }
+        });
+
+        impButton1.setText("Import");
+        impButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                impButton1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -346,11 +371,16 @@ public class HunterConfig extends JPanel implements ITab {
                         .addComponent(jSeparator2))
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(editProbe, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(delProbe, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(addProbe, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(copyProbe, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                    .addComponent(editProbe, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 80, Short.MAX_VALUE)
+                                    .addComponent(addProbe, javax.swing.GroupLayout.DEFAULT_SIZE, 80, Short.MAX_VALUE)
+                                    .addComponent(copyProbe, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 80, Short.MAX_VALUE))
+                                .addComponent(expButton, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(impButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(loadButton, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(delProbe, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 473, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
@@ -401,7 +431,12 @@ public class HunterConfig extends JPanel implements ITab {
                         .addComponent(copyProbe)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(delProbe)
-                        .addGap(0, 0, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(loadButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(impButton1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(expButton))
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 325, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -532,13 +567,119 @@ public class HunterConfig extends JPanel implements ITab {
         }
     }//GEN-LAST:event_hunterKeyFocusLost
 
+    private void loadButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadButtonActionPerformed
+        JFileChooser fc = new JFileChooser();
+        fc.setSelectedFile(new File("hunter.properties"));
+        Properties prop2 = new Properties();
+        DefaultTableModel model = (DefaultTableModel) probeTable.getModel();
+        int returnVal = fc.showSaveDialog(HunterConfig.this);
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            model.setNumRows(0);
+            try {
+                prop2.load(new FileInputStream(fc.getSelectedFile()));
+                prop2.setProperty("domain", prop.getProperty("domain"));
+                prop2.setProperty("key", prop.getProperty("key"));
+                probes = new ArrayList<>(Arrays.asList(prop2.getProperty("probes").replace(" ", "").replace("[", "").replace("]", "").split(",")));
+                probes.forEach(probe -> {
+                    model.addRow(new Object[]{Boolean.parseBoolean(prop2.getProperty("probe["+probe+"][enabled]")), probe, prop2.getProperty("probe["+probe+"][inject]"), prop2.getProperty("probe["+probe+"][base64]")});
+                });
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(HunterConfig.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(HunterConfig.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+            if (fConfig.exists()) {
+                try {
+                    prop2.store(new FileOutputStream(fConfig), null);
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(HunterConfig.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(HunterConfig.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+    }//GEN-LAST:event_loadButtonActionPerformed
+
+    private void expButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_expButtonActionPerformed
+        JFileChooser fc = new JFileChooser();
+        Properties p2 = prop;
+        fc.setSelectedFile(new File("hunter.properties"));
+        int returnVal = fc.showSaveDialog(HunterConfig.this);
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            File file = fc.getSelectedFile();
+            try {
+                p2.remove("domain");
+                p2.remove("key");
+                p2.store(new FileOutputStream(file), null);
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(HunterConfig.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(HunterConfig.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_expButtonActionPerformed
+
+    private void impButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_impButton1ActionPerformed
+        DefaultTableModel model = (DefaultTableModel) probeTable.getModel();
+        JFileChooser fc = new JFileChooser();
+        Properties prop2 = new Properties();
+        fc.setSelectedFile(new File("hunter.properties"));
+        int returnVal = fc.showOpenDialog(HunterConfig.this);
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            try {
+                prop2.load(new FileInputStream(fc.getSelectedFile()));
+                if (prop2.containsKey("probes")) {
+                    probes = new ArrayList<>(Arrays.asList(prop.getProperty("probes").replace(" ", "").replace("[", "").replace("]", "").split(",")));
+                    List<String> probes2 = new ArrayList<>(Arrays.asList(prop2.getProperty("probes").replace(" ", "").replace("[", "").replace("]", "").split(",")));
+                    probes2.forEach((probe) -> {
+                        if(probes.contains(probe)) {
+                            if(prop.getProperty("probe["+probe+"][inject]").equals(prop2.getProperty("probe["+probe+"][inject]")) && prop.getProperty("probe["+probe+"][base64]").equals(prop2.getProperty("probe["+probe+"][base64]"))) {
+                                //Do Nothing
+                            } else {
+                                probes.add(probe+"(1)");
+                                prop.setProperty("probes", probes.toString());
+                                prop.setProperty("probe["+probe+"(1)][enabled]", prop2.getProperty("probe["+probe+"][enabled]"));
+                                prop.setProperty("probe["+probe+"(1)][inject]", prop2.getProperty("probe["+probe+"][inject]"));
+                                prop.setProperty("probe["+probe+"(1)][base64]", prop2.getProperty("probe["+probe+"][base64]"));
+                                model.addRow(new Object[]{Boolean.parseBoolean(prop.getProperty("probe["+probe+"(1)][enabled]")), probe+"(1)", prop.getProperty("probe["+probe+"(1)][inject]"), prop.getProperty("probe["+probe+"(1)][base64]")});
+                            }
+                        } else {
+                            probes.add(probe);
+                            prop.setProperty("probes", probes.toString());
+                            prop.setProperty("probe["+probe+"][enabled]", prop2.getProperty("probe["+probe+"][enabled]"));
+                            prop.setProperty("probe["+probe+"][inject]", prop2.getProperty("probe["+probe+"][inject]"));
+                            prop.setProperty("probe["+probe+"][base64]", prop2.getProperty("probe["+probe+"][base64]"));
+                            model.addRow(new Object[]{Boolean.parseBoolean(prop.getProperty("probe["+probe+"][enabled]")), probe, prop.getProperty("probe["+probe+"][inject]"), prop.getProperty("probe["+probe+"][base64]")});
+                        }                        
+                    });
+                }
+                if (fConfig.exists()) {
+                    try {
+                        prop.store(new FileOutputStream(fConfig), null);
+                    } catch (FileNotFoundException ex) {
+                        Logger.getLogger(HunterConfig.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (IOException ex) {
+                        Logger.getLogger(HunterConfig.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(HunterConfig.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(HunterConfig.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_impButton1ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addProbe;
     private javax.swing.JButton copyProbe;
     private javax.swing.JButton delProbe;
     private javax.swing.JButton editProbe;
+    private javax.swing.JButton expButton;
     private javax.swing.JTextField hunterDomain;
     private javax.swing.JTextField hunterKey;
+    private javax.swing.JButton impButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel2;
@@ -551,6 +692,7 @@ public class HunterConfig extends JPanel implements ITab {
     private javax.swing.JLabel jLabel9;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSeparator jSeparator2;
+    private javax.swing.JButton loadButton;
     private javax.swing.JTextField newBase;
     private javax.swing.JTextField newInject;
     private javax.swing.JTextField newProbe;
